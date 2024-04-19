@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operaciones</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <style>
+        .cuadro {
+            border: 2px solid #000;
+            padding: 20px;
+            width: 300px;
+            position: relative;
+        }
+
+        .capital {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .fecha-hora {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="cuadro">
+        <h1>Operaciones</h1>
+        <span class="fecha-hora" id="fecha-hora"></span>
+        <span class="capital" id="capital-mostrado">Capital: $0.00</span>
+        
+        <br><br>
+
+        <label for="capital">Capital:</label>
+        <input type="number" id="capital">
+        <button onclick="cargarCapital()">Cargar</button>
+        <button onclick="limpiarCapital()">🧹</button>
+
+        <br><br>
+
+        <label for="tipo-operacion">Tipo de operación:</label>
+        <select id="tipo-operacion">
+            <option value="">Seleccionar...</option>
+            <option value="largo">Largo</option>
+            <option value="corto">Corto</option>
+        </select>
+
+        <br><br>
+
+        <label for="precio-entrada">Precio de entrada:</label>
+        <input type="number" id="precio-entrada">
+        
+        <br><br>
+
+        <label for="precio-salida">Precio de salida:</label>
+        <input type="number" id="precio-salida">
+        
+        <br><br>
+
+        <button onclick="calcularDiferencia()">Calcular Diferencia</button>
+        
+        <br><br>
+
+        <p id="info-diferencia"></p>
+        <p id="info-operaciones"></p>
+        <p id="info-rentabilidad"></p>
+    </div>
+
+    <script>
+        function actualizarFechaHora() {
+            const ahora = new Date();
+            const fechaHora = ahora.toLocaleString();
+            document.getElementById('fecha-hora').textContent = fechaHora;
+        }
+
+        setInterval(actualizarFechaHora, 1000); // Actualizar cada segundo
+
+        let capital = 0;
+        let operacionesGanadas = 0;
+        let operacionesPerdidas = 0;
+
+        function cargarCapital() {
+            capital = parseFloat(document.getElementById('capital').value);
+            mostrarCapital();
+        }
+
+        function limpiarCapital() {
+            capital = 0;
+            mostrarCapital();
+        }
+
+        function mostrarCapital() {
+            document.getElementById('capital-mostrado').textContent = `Capital: $${capital.toFixed(2)}`;
+        }
+
+        function calcularDiferencia() {
+            const tipoOperacion = document.getElementById('tipo-operacion').value;
+            const precioEntrada = parseFloat(document.getElementById('precio-entrada').value);
+            const precioSalida = parseFloat(document.getElementById('precio-salida').value);
+            
+            if (isNaN(precioEntrada) || isNaN(precioSalida)) {
+                alert('Por favor, ingresa los precios de entrada y salida.');
+                return;
+            }
+
+            let diferencia = precioSalida - precioEntrada;
+            
+            if (tipoOperacion === 'largo') {
+                if (diferencia > 0) {
+                    operacionesGanadas++;
+                    capital += diferencia;
+                } else {
+                    operacionesPerdidas++;
+                    capital -= Math.abs(diferencia);
+                }
+            } else if (tipoOperacion === 'corto') {
+                if (diferencia < 0) {
+                    operacionesGanadas++;
+                    capital += Math.abs(diferencia);
+                } else {
+                    operacionesPerdidas++;
+                    capital -= diferencia;
+                }
+            } else {
+                alert('Por favor, selecciona el tipo de operación.');
+                return;
+            }
+
+            mostrarResultado(diferencia);
+            mostrarRentabilidad();
+        }
+
+        function mostrarResultado(diferencia) {
+            document.getElementById('info-diferencia').textContent = `Diferencia: $${diferencia.toFixed(2)}`;
+            document.getElementById('info-operaciones').innerHTML = `Operaciones Ganadas: ${operacionesGanadas}<br>Operaciones Perdidas: ${operacionesPerdidas}`;
+            mostrarCapital();
+        }
+
+        function mostrarRentabilidad() {
+            const totalOperaciones = operacionesGanadas + operacionesPerdidas;
+            const rentabilidad = totalOperaciones === 0 ? 0 : (operacionesGanadas / totalOperaciones) * 100;
+            document.getElementById('info-rentabilidad').textContent = `Rentabilidad: ${rentabilidad.toFixed(2)}%`;
+        }
+
+        function generarContenido() {
+            const fechaHora = new Date().toLocaleString();
+            const capitalMostrado = document.getElementById('capital-mostrado').textContent;
+            const diferencia = document.getElementById('info-diferencia').textContent;
+            const operaciones = document.getElementById('info-operaciones').textContent;
+            const rentabilidad = document.getElementById('info-rentabilidad').textContent;
+
+            const contenido = `Fecha y hora: ${fechaHora}\n\n` +
+                              `Capital: ${capitalMostrado}\n` +
+                              `Diferencia: ${diferencia}\n` +
+                              `Operaciones:\n${operaciones}\n` +
+                              `Rentabilidad: ${rentabilidad}\n`;
+
+            return contenido;
+        }
+
+        // Cargar la API de Google Client Library
+        gapi.load('client', init);
+
+        function init() {
+            // Inicializar la API client con tus credenciales de OAuth2
+            gapi.client.init({
+                apiKey: 'AIzaSyBv4-xRnOYK9xny-cHtsMsYzOK9qCJ3QEo',
+                clientId: '1005179856010-morhsojeq4rbs732lgnvubnvg7cmch5a.apps.googleusercontent.com',
+                discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+                scope: 'https://www.googleapis.com/auth/drive.file'
+            });
+        }
+
+        function writeToGoogleDrive(documentId, content) {
+            gapi.client.drive.files.update({
+                fileId: documentId,
+                media: {
+                    mimeType: 'text/plain',
+                    body: content
+                }
+            }).then(function(response) {
+                console.log('Documento actualizado:', response);
+            }, function(error) {
+                console.error('Error al actualizar el documento:', error);
+            });
+        }
+
+    </script>
+</body>
+</html>
