@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Precio de BTC/USDT en Binance</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            position: relative; /* Asegura que el posicionamiento sea relativo al body */
+        }
+        h1, h2, h3 {
+            margin-top: 0;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .positive {
+            background-color: #c8e6c9; /* Verde */
+        }
+        .negative {
+            background-color: #ffcdd2; /* Rojo */
+        }
+        /* Estilos adicionales */
+        table#last-candles tbody tr td {
+            padding: 12px;
+            color: #000000; /* Texto en negro */
+        }
+        table#last-candles tbody tr.positive {
+            background-color: #c8e6c9; /* Verde */
+        }
+        table#last-candles tbody tr.negative {
+            background-color: #ffcdd2; /* Rojo */
+        }
+        table#last-candles tbody tr:hover {
+            background-color: #f0f0f0;
+        }
+        
+        /* Estilos para el cuadro */
+        .cuadro-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .cuadro {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+            width: calc(100% / 7 - 20px); /* Ajustar el ancho para 7 cuadros */
+            margin-right: 20px; /* Espacio entre cuadros */
+        }
+
+        /* Estilos para el contenedor de precio */
+        .precio-container {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 10px;
+            font-weight: bold;
+            font-size: 1.5em; /* Mismo tamaño que el título principal */
+        }
+    </style>
+</head>
+<body>
+    <!-- Contenedor del precio -->
+    <div class="precio-container">
+        
+    </div>
+
+    <h1>Versión <span id="version">1.0</span></h1>
+    <h2>Precio de BTC/USDT en Binance</h2>
+    <p id="btc-price"></p>
+    <div class="cuadro-container">
+        <!-- Copias del cuadro original con ajustes para diferentes temporalidades -->
+        <!-- Rango 3 Min -->
+        <div class="cuadro" id="cuadro-3m">
+            <h3>Rango 3 Min</h3>
+            <div>
+                <input type="number" id="rango-superior-3m" step="0.01" placeholder="Sup">
+                <span id="rango-superior-value-3m"></span>
+            </div>
+            <div>
+                <input type="number" id="rango-inferior-3m" step="0.01" placeholder="Inf">
+                <span id="rango-inferior-value-3m"></span>
+            </div>
+            <div>
+                <button onclick="definirRango('3m')">Definir rango</button>
+                <button onclick="limpiarCampos('3m')">🧹</button>
+            </div>
+        </div>
+
+        <!-- Rango 5 Min -->
+        <div class="cuadro" id="cuadro-5m">
+            <h3>Rango 5 Min</h3>
+            <div>
+                <input type="number" id="rango-superior-5m" step="0.01" placeholder="Sup">
+                <span id="rango-superior-value-5m"></span>
+            </div>
+            <div>
+                <input type="number" id="rango-inferior-5m" step="0.01" placeholder="Inf">
+                <span id="rango-inferior-value-5m"></span>
+            </div>
+            <div>
+                <button onclick="definirRango('5m')">Definir rango</button>
+                <button onclick="limpiarCampos('5m')">🧹</button>
+            </div>
+        </div>
+
+        <!-- Rango 15 Min -->
+        <div class="cuadro" id="cuadro-15m">
+            <h3>Rango 15 Min</h3>
+            <div>
+                <input type="number" id="rango-superior-15m" step="0.01" placeholder="Sup">
+                <span id="rango-superior-value-15m"></span>
+            </div>
+            <div>
+                <input type="number" id="rango-inferior-15m" step="0.01" placeholder="Inf">
+                <span id="rango-inferior-value-15m"></span>
+            </div>
+            <div>
+                <button onclick="definirRango('15m')">Definir rango</button>
+                <button onclick="limpiarCampos('15m')">🧹</button>
+            </div>
+        </div>
+
+        <!-- Rango 30 Min -->
+        <div class="cuadro" id="cuadro-30m">
+            <h3>Rango 30 Min</h3>
+            <div>
+                <input type="number" id="rango-superior-30m" step="0.01" placeholder="Sup">
+                <span id="rango-superior-value-30m"></span>
+            </div>
+            <div>
+                <input type="number" id="rango-inferior-30m" step="0.01" placeholder="Inf">
+                <span id="rango-inferior-value-30m"></span>
+            </div>
+            <div>
+                <button onclick="definirRango('30m')">Definir rango</button>
+                <button onclick="limpiarCampos('30m')">🧹</button>
+            </div>
+        </div>
+
+        <!-- Rango 1 Hora -->
+        <div class="cuadro" id="cuadro-1h">
+            <h3>Rango 1 Hora</h3>
+            <div>
+                <input type="number" id="rango-superior-1h" step="0.01" placeholder="Sup">
+                <span id="rango-superior-value-1h"></span>
+            </div>
+            <div>
+                <input type="number" id="rango-inferior-1h" step="0.01" placeholder="Inf">
+                <span id="rango-inferior-value-1h"></span>
+            </div>
+            <div>
+                <button onclick="definirRango('1h')">Definir rango</button>
+                <button onclick="limpiarCampos('1h')">🧹</button>
+            </div>
+        </div>
+
+        <!-- Rango 1 Día -->
+        <div class="cuadro" id="cuadro-1d">
+            <h3>Rango 1 Día</h3>
+            <div>
+                <input type="number" id="rango-superior-1d" step="0.01" placeholder="Sup">
+                <span id="rango-superior-value-1d"></span>
+            </div>
+            <div>
+                <input type="number" id="rango-inferior-1d" step="0.01" placeholder="Inf">
+                <span id="rango-inferior-value-1d"></span>
+            </div>
+            <div>
+                <button onclick="definirRango('1d')">Definir rango</button>
+                <button onclick="limpiarCampos('1d')">🧹</button>
+            </div>
+        </div>
+
+        <!-- Rango 1 Semana -->
+        <div class="cuadro" id="cuadro-1w">
+            <h3>Rango 1 Semana</h3>
+            <div>
+                <input type="number" id="rango-superior-1w" step="0.01" placeholder="Sup">
+                <span id="rango-superior-value-1w"></span>
+            </div>
+            <div>
+                <input type="number" id="rango-inferior-1w" step="0.01" placeholder="Inf">
+                <span id="rango-inferior-value-1w"></span>
+            </div>
+            <div>
+                <button onclick="definirRango('1w')">Definir rango</button>
+                <button onclick="limpiarCampos('1w')">🧹</button>
+            </div>
+        </div>
+
+        <!-- Rango 1 Mes -->
+        <div class="cuadro" id="cuadro-1M">
+            <h3>Rango 1 Mes</h3>
+            <div>
+                <input type="number" id="rango-superior-1M" step="0.01" placeholder="Sup">
+                <span id="rango-superior-value-1M"></span>
+            </div>
+            <div>
+                <input type="number" id="rango-inferior-1M" step="0.01" placeholder="Inf">
+                <span id="rango-inferior-value-1M"></span>
+            </div>
+            <div>
+                <button onclick="definirRango('1M')">Definir rango</button>
+                <button onclick="limpiarCampos('1M')">🧹</button>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <label for="temporalidad">Selecciona la temporalidad:</label>
+        <select id="temporalidad" onchange="actualizarTemporalidad()">
+            <option value="3m">3 minutos</option>
+            <option value="5m">5 minutos</option>
+            <option value="15m">15 minutos</option>
+            <option value="30m">30 minutos</option>
+            <option value="1h">1 hora</option>
+            <option value="1d">1 día</option>
+            <option value="1w">1 semana</option>
+            <option value="1M">1 mes</option>
+        </select>
+    </div>
+    <div id="chart">
+        <h3 id="temporalidad-seleccionada">Temporalidad seleccionada: 15 minutos</h3>
+        <table id="last-candles">
+            <thead>
+                <tr>
+                    <th>Vela</th>
+                    <th>Apertura</th>
+                    <th>Máximo</th>
+                    <th>Mínimo</th>
+                    <th>Cierre</th>
+                    <th>Volumen</th>
+                    <th>Diferencia en USD</th>
+                    <th>Resistencia</th>
+                    <th>Autocorrección</th>
+                    <th>Soporte</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+    </div>
+    <audio id="alert-sound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
+    <script>
+        let version = 1.0; // Inicializar la versión del código
+
+        // Función para calcular la resistencia, soporte y autocorrección
+        function calcularNiveles(precioApertura, precioCierre, precioMaximo, precioMinimo) {
+            const diferencia = precioMaximo - precioMinimo;
+            const resistencia = precioMaximo - (diferencia / 3);
+            const soporte = precioMinimo + (diferencia / 3);
+            const autocorreccion = (precioMaximo + precioMinimo) / 2;
+            return { resistencia, soporte, autocorreccion };
+        }
+
+        // Función para obtener y mostrar el precio de BTC/USDT en Binance
+        function obtenerPrecioBTC(temporalidad) {
+            fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=${temporalidad}&limit=5`)
+            .then(response => response.json())
+            .then(data => {
+                // Obtener el precio del objeto de respuesta
+                const precio = parseFloat(data[data.length - 1][4]); // Último precio en la vela más reciente
+
+                // Mostrar el precio en la página
+                document.getElementById('btc-price').textContent = `Precio: ${precio.toFixed(2)} USDT`;
+
+                // Mostrar los datos de las últimas 5 velas japonesas en la tabla
+                const tableBody = document.querySelector('#last-candles tbody');
+                tableBody.innerHTML = '';
+                for (let i = 0; i < data.length; i++) {
+                    const candle = data[i];
+                    const open = parseFloat(candle[1]);
+                    const high = parseFloat(candle[2]);
+                    const low = parseFloat(candle[3]);
+                    const close = parseFloat(candle[4]);
+                    const volume = parseFloat(candle[5]);
+                    const diferenciaUSD = close - open;
+                    const { resistencia, soporte, autocorreccion } = calcularNiveles(open, close, high, low);
+                    const row = `
+                        <tr class="${diferenciaUSD >= 0 ? 'positive' : 'negative'}">
+                            <td>${i + 1}</td>
+                            <td>${open.toFixed(2)}</td>
+                            <td>${high.toFixed(2)}</td>
+                            <td>${low.toFixed(2)}</td>
+                            <td>${close.toFixed(2)}</td>
+                            <td>${volume.toFixed(2)}</td>
+                            <td>${diferenciaUSD.toFixed(2)}</td>
+                            <td>${resistencia.toFixed(2)}</td>
+                            <td>${autocorreccion.toFixed(2)}</td>
+                            <td>${soporte.toFixed(2)}</td>
+                        </tr>
+                    `;
+                    tableBody.insertAdjacentHTML('beforeend', row);
+                }
+
+                // Actualizar los colores de los cuadros de rango
+                actualizarColoresRango();
+            });
+        }
+
+        // Función para actualizar la temporalidad seleccionada
+        function actualizarTemporalidad() {
+            const temporalidadSeleccionada = document.getElementById('temporalidad').value;
+            document.getElementById('temporalidad-seleccionada').textContent = `Temporalidad seleccionada: ${temporalidadSeleccionada}`;
+            obtenerPrecioBTC(temporalidadSeleccionada);
+        }
+
+        // Función para definir un rango personalizado
+	function definirRango(temporalidad) {
+    	     const rangoSuperiorInput = document.getElementById(`rango-superior-${temporalidad}`);
+   	     const rangoInferiorInput = document.getElementById(`rango-inferior-${temporalidad}`);
+    
+             const rangoSuperior = parseFloat(rangoSuperiorInput.value);
+             const rangoInferior = parseFloat(rangoInferiorInput.value);
+
+             // Validar que el rango superior sea mayor que el rango inferior
+             if (!isNaN(rangoSuperior) && !isNaN(rangoInferior) && rangoSuperior < rangoInferior) {
+             alert('El valor del rango superior debe ser mayor que el valor del rango inferior.');
+             return;
+             }
+
+             // Continuar con la lógica para definir el rango si la validación pasa
+             document.getElementById(`rango-superior-value-${temporalidad}`).textContent = `Sup: ${rangoSuperior.toFixed(2)}`;
+             document.getElementById(`rango-inferior-value-${temporalidad}`).textContent = `Inf: ${rangoInferior.toFixed(2)}`;
+        }
+
+        function definirRango(temporalidad) {
+            const rangoSuperior = parseFloat(document.getElementById(`rango-superior-${temporalidad}`).value);
+            const rangoInferior = parseFloat(document.getElementById(`rango-inferior-${temporalidad}`).value);
+            if (!isNaN(rangoSuperior) && !isNaN(rangoInferior)) {
+                document.getElementById(`rango-superior-value-${temporalidad}`).textContent = `Sup: ${rangoSuperior.toFixed(2)}`;
+                document.getElementById(`rango-inferior-value-${temporalidad}`).textContent = `Inf: ${rangoInferior.toFixed(2)}`;
+            } else {
+                alert('Por favor, introduce valores numéricos válidos.');
+            }
+        }
+
+        // Función para limpiar los campos de rango personalizado
+        function limpiarCampos(temporalidad) {
+            document.getElementById(`rango-superior-${temporalidad}`).value = '';
+            document.getElementById(`rango-inferior-${temporalidad}`).value = '';
+            document.getElementById(`rango-superior-value-${temporalidad}`).textContent = '';
+            document.getElementById(`rango-inferior-value-${temporalidad}`).textContent = '';
+
+            // Restaurar el color del cuadro de rango
+            const cuadro = document.getElementById(`cuadro-${temporalidad}`);
+            cuadro.style.backgroundColor = '';
+        }
+
+        // Función para actualizar los colores de los cuadros de rango
+        function actualizarColoresRango() {
+            const temporalidades = ['3m', '5m', '15m', '30m', '1h', '1d', '1w', '1M'];
+            temporalidades.forEach(temporalidad => {
+                const cuadro = document.getElementById(`cuadro-${temporalidad}`);
+                const rangoSuperior = parseFloat(document.getElementById(`rango-superior-${temporalidad}`).value);
+                const rangoInferior = parseFloat(document.getElementById(`rango-inferior-${temporalidad}`).value);
+                const precio = parseFloat(document.getElementById('btc-price').textContent.split(' ')[1]); // Obtener el precio actual de BTC/USDT
+
+                if (!isNaN(rangoSuperior) && !isNaN(rangoInferior)) {
+                    if (precio > rangoSuperior) {
+                        cuadro.style.backgroundColor = '#008000'; // Verde
+                    } else if (precio < rangoInferior) {
+                        cuadro.style.backgroundColor = '#D0021B'; // Rojo
+                    } else {
+                        cuadro.style.backgroundColor = ''; // Restaurar el color por defecto
+                    }
+                }
+            });
+        }
+
+        // Función para actualizar el precio cada medio segundo
+        function actualizarPrecio() {
+            setInterval(() => {
+                obtenerPrecioBTC(document.getElementById('temporalidad').value);
+            }, 500);
+        }
+
+        // Inicializar la aplicación
+        function inicializar() {
+            // Actualizar la temporalidad seleccionada
+            actualizarTemporalidad();
+            // Actualizar el precio cada medio segundo
+            actualizarPrecio();
+        }
+
+        // Ejecutar la función de inicialización cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', inicializar);
+    </script>
+</body>
+</html>
