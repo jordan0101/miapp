@@ -71,9 +71,20 @@
             font-weight: bold;
             font-size: 1.5em; /* Mismo tamaño que el título principal */
         }
+
+        /* Estilos para el texto de la firma */
+        .firma {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 10px;
+            font-size: 0.8em;
+        }
     </style>
 </head>
 <body>
+   
+
     <!-- Contenedor del precio -->
     <div class="precio-container">
         
@@ -402,5 +413,9 @@
         // Ejecutar la función de inicialización cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', inicializar);
     </script>
+    <div style="position: absolute; top: 0; right: 0;">
+        <p>Desarrollado por: Jorge Escobar</p>
+        <p>Email: traderpy22@gmail.com</p>
+    </div>
 </body>
 </html>
