@@ -242,6 +242,20 @@
                 <button onclick="limpiarCampos('1M')">🧹</button>
             </div>
         </div>
+	<!-- Calculadora de Swing -->
+<div class="cuadro" id="cuadro-swing">
+    <h3>Calculadora de Swing</h3>
+    <div>
+        <input type="number" id="max" step="0.01" placeholder="Max">
+    </div>
+    <div>
+        <input type="number" id="min" step="0.01" placeholder="Min">
+    </div>
+    <div>
+        <button onclick="calcularSwing()">Calcular</button>
+    </div>
+    <div id="resultado-swing"></div> <!-- Contenedor para mostrar los resultados -->
+</div>
     </div>
 
     <div>
@@ -291,6 +305,24 @@
             const autocorreccion = (precioMaximo + precioMinimo) / 2;
             return { resistencia, soporte, autocorreccion };
         }
+	// Función para calcular los valores de Resistencia, Autocorrección y Soporte
+function calcularSwing() {
+    const max = parseFloat(document.getElementById('max').value);
+    const min = parseFloat(document.getElementById('min').value);
+    if (!isNaN(max) && !isNaN(min)) {
+        const resistencia = max - ((max - min) / 3);
+        const autocorreccion = (max + min) / 2;
+        const soporte = min + ((max - min) / 3);
+        document.getElementById('resultado-swing').innerHTML = `
+            <p><strong>R:</strong> ${resistencia.toFixed(2)}</p>
+            <p><strong>A:</strong> ${autocorreccion.toFixed(2)}</p>
+            <p><strong>S:</strong> ${soporte.toFixed(2)}</p>
+        `;
+    } else {
+        alert('Por favor, introduce valores numéricos válidos.');
+    }
+}
+
 
         // Función para obtener y mostrar el precio de BTC/USDT en Binance
         function obtenerPrecioBTC(temporalidad) {
